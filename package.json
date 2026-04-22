@@ -19,6 +19,7 @@
     "config": "prisma.config.ts"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "@google/genai": "^1.50.1",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
@@ -34,7 +35,6 @@
     "@types/express": "^5.0.6",
     "@types/node": "^25.5.2",
     "@types/pg": "^8.20.0",
-    "dotenv": "^17.4.2",
     "nodemon": "^3.1.14",
     "prisma": "^7.7.0",
     "ts-node": "^10.9.2",
