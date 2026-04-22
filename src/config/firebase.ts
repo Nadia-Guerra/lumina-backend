@@ -14,7 +14,7 @@ try {
     }
 } catch (error) {
     console.error("❌ Error al cargar las credenciales de Firebase:", error);
-    throw error; // ← agrega esto para que el error no se trague
+    throw error;
 }
 
 export default admin;

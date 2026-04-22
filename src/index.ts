@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import recommendationRoutes from './routes/recommendation.routes.js';
 import authRoutes from "./routes/auth.route.js";
+import reviewRoute from "./routes/review.route.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,7 +18,7 @@ app.use((req, res, next) => {
   next();
 });
 
-
+app.use('/api/reviews', reviewRoute)
 app.use('/api/auth', authRoutes);
 
 

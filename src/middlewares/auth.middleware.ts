@@ -13,22 +13,28 @@ export const verifyToken = async (req:Request, res:Response, next:NextFunction) 
 
     try{
         const decoded = await admin.auth().verifyIdToken(token!); //quitar el !
-        (req as any).user = decoded; //correccion rapida, luego se arregla
-        next();
+        console.log("✅ Token de Firebase verificado para UID:", decoded.uid);
 
         const dbUser = await prisma.user.findUnique({
             where: { firebaseUid: decoded.uid }
         });
 
         if (!dbUser) {
+            console.log("❌ Usuario con UID", decoded.uid, "no encontrado en PostgreSQL");
             return res.status(401).json({ success: false, message: 'Usuario no registrado en el sistema' });
+
         }
 
-        (req as any).user = { ...decoded, dbId: dbUser.id };
+        (req as any).user = {
+            ...decoded,
+            dbId: dbUser.id
+        };
+
+        console.log("Autenticación exitosa. Pasando al controlador...");
         next();
 
-
     }catch(error){
+        console.error(" Error verificando token de Firebase:", error);
         return res.status(401).json({message: 'Invalid token'});
     }
 }
