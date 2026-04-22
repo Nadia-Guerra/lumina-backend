@@ -1,94 +1,90 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider   = "postgresql"
+  extensions = [uuid_ossp(map: "uuid-ossp")]
 }
 
 model User {
-  id         String    @id @default(uuid())
-  username   String    @unique
-  email      String    @unique
-  password   String
-  created_at DateTime  @default(now())
-  favorites  Favorite[]
-  reviews    Review[]
+  id        String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username  String     @db.VarChar(50)
+  email     String     @unique @db.VarChar(100)
+  password  String     @db.VarChar(255)
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  reviews   Review[]
+  favorites Favorite[]
+
+  @@map("users")
 }
 
 model MakeupProduct {
-  id              String         @id @default(uuid())
-  external_id     Int            @unique
-  name            String
-  description     String?
-  img_url         String?
-  product_type_id String?
-  productType     ProductType?   @relation(fields: [product_type_id], references: [id])
-  colors          ProductColor[]
-  favorites       Favorite[]
-  reviews         Review[]
-}
+  id         String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  externalId Int        @unique @map("external_id")
+  name       String?    @db.VarChar(100)
+  imgUrl     String?    @map("img_url") @db.VarChar(255)
+  reviews    Review[]
+  favorites  Favorite[]
 
-model ProductColor {
-  id                String        @id @default(uuid())
-  color_name        String
-  hex_code          String?
-  makeup_product_id String
-  product           MakeupProduct @relation(fields: [makeup_product_id], references: [id])
-}
-
-model ProductType {
-  id              String          @id @default(uuid())
-  name            String
-  products        MakeupProduct[]
-  styleRequirements StyleRequiredProductType[]
-}
-
-model Favorite {
-  id                String        @id @default(uuid())
-  user_id           String
-  makeup_product_id String
-  created_at        DateTime      @default(now())
-  user              User          @relation(fields: [user_id], references: [id])
-  product           MakeupProduct @relation(fields: [makeup_product_id], references: [id])
-
-  @@unique([user_id, makeup_product_id])
-}
-
-model Review {
-  id                String        @id @default(uuid())
-  rating            Int
-  content           String?
-  created_at        DateTime      @default(now())
-  user_id           String
-  makeup_product_id String
-  user              User          @relation(fields: [user_id], references: [id])
-  product           MakeupProduct @relation(fields: [makeup_product_id], references: [id])
+  @@map("makeup_products")
 }
 
 model MakeupStyle {
-  id          String     @id @default(uuid())
-  name        String
-  description String?
-  style_img   String?
+  id          String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String          @db.VarChar(50)
+  description String?         @db.Text
+  styleImg    String?         @map("style_img") @db.VarChar(255)
+  rules       StyleRule[]
   examples    MakeupExample[]
-  requiredProductTypes StyleRequiredProductType[]
+
+  @@map("makeup_styles")
+}
+
+model StyleRule {
+  id             String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  styleId        String      @map("style_id") @db.Uuid
+  productType    String?     @map("product_type") @db.VarChar(50)
+  tagRequirement String?     @map("tag_requirement") @db.VarChar(50)
+  colorFamily    String?     @map("color_family") @db.VarChar(50)
+  style          MakeupStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@map("style_rules")
 }
 
 model MakeupExample {
-  id          String      @id @default(uuid())
-  name        String
-  description String?
-  example_img String?
-  style_id    String
-  style       MakeupStyle @relation(fields: [style_id], references: [id])
+  id           String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  styleId      String      @map("style_id") @db.Uuid
+  title        String?     @db.VarChar(100)
+  imageUrl     String?     @map("image_url") @db.VarChar(255)
+  tutorialTips String?     @map("tutorial_tips") @db.Text
+  style        MakeupStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@map("makeup_examples")
 }
 
-model StyleRequiredProductType {
-  style_id        String
-  product_type_id String
-  style           MakeupStyle @relation(fields: [style_id], references: [id])
-  productType     ProductType @relation(fields: [product_type_id], references: [id])
+model Review {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  rating          Int?
+  content         String?       @db.Text
+  userId          String        @map("user_id") @db.Uuid
+  makeupProductId String        @map("makeup_product_id") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product         MakeupProduct @relation(fields: [makeupProductId], references: [id], onDelete: Cascade)
 
-  @@id([style_id, product_type_id])
+  @@map("reviews")
+}
+
+model Favorite {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String        @map("user_id") @db.Uuid
+  makeupProductId String        @map("makeup_product_id") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product         MakeupProduct @relation(fields: [makeupProductId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, makeupProductId], name: "unique_user_favorite")
+  @@map("favorites")
 }
