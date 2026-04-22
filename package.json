@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "type": "module",
+  "prisma": {
+    "config": "prisma.config.ts"
+  },
   "dependencies": {
     "@google/genai": "^1.50.1",
     "@prisma/adapter-pg": "^7.7.0",
