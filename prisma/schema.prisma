@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  previewFeatures = ["postgresqlExtensions", "driverAdapters"]
 }
 
 datasource db {
@@ -10,6 +10,7 @@ datasource db {
 
 model User {
   id        String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  firebaseUid String     @unique @map("firebase_uid")
   username  String     @db.VarChar(50)
   email     String     @unique @db.VarChar(100)
   password  String     @db.VarChar(255)

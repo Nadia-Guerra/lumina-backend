@@ -1,0 +1,4 @@
+import { Request, Response } from 'express';
+export declare const register: (req: Request, res: Response) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const loginSync: (req: Request, res: Response) => Promise<void>;
+//# sourceMappingURL=auth.controllers.d.ts.map
