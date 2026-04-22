@@ -1,20 +1,12 @@
 import admin from 'firebase-admin';
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
 
-try {
-    const serviceAccount = require('../../firebase-account.json');
-    console.log("JSON cargado:", !!serviceAccount);
+if (!admin.apps.length) {
+    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT!);
 
-    if (!admin.apps.length) {
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
-        console.log("✅ Firebase Admin inicializado correctamente");
-    }
-} catch (error) {
-    console.error("❌ Error al cargar las credenciales de Firebase:", error);
-    throw error;
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+    console.log("✅ Firebase Admin inicializado correctamente");
 }
 
 export default admin;
