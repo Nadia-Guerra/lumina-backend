@@ -5,6 +5,7 @@ import recommendationRoutes from './routes/recommendation.routes.js';
 import authRoutes from "./routes/auth.route.js";
 import reviewRoute from "./routes/review.route.js";
 import favouriteRoutes from "./routes/favourite.routes.js";
+import productRoutes from "./routes/product.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,6 +26,7 @@ app.use('/api/auth', authRoutes);
 
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/favourites', favouriteRoutes);
+app.use('/api/products', productRoutes);
 
 app.get('/', (req, res) => {
   res.send('Lumina Backend API is running');

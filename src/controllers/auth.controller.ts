@@ -35,7 +35,6 @@ export const register = async (req: Request, res: Response) => {
 
 export const loginSync = async (req: Request, res: Response) => {
     try {
-        // El usuario ya viene decodificado por el middleware verifyToken
         const { uid, email, name } = (req as any).user;
 
         const user = await authService.syncUser(uid, email, name);

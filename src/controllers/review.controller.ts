@@ -4,7 +4,6 @@ import { reviewService } from '../services/review.service.js';
 export const createReview = async (req: Request, res: Response) => {
     try {
         const { rating, content } = req.body;
-        //para que no de errores de tipado
         const productIdParam = req.params.productId as string;
         const externalProductId = parseInt(productIdParam, 10);
         const userId = (req as any).user?.dbId;

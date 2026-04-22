@@ -3,20 +3,18 @@ import admin from '../config/firebase.js';
 
 export const authService = {
     register: async (email: string, pass: string, username: string) => {
-        // 1. Crear en Firebase
         const userRecord = await admin.auth().createUser({
             email,
             password: pass,
             displayName: username,
         });
 
-        // 2. Crear en PostgreSQL usando Prisma
         return await prisma.user.create({
             data: {
                 firebaseUid: userRecord.uid,
                 email: email,
                 username: username,
-                password: 'EXTERNAL_AUTH' // No guardamos la pass localmente por seguridad
+                password: 'EXTERNAL_AUTH'
             }
         });
     },

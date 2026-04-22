@@ -6,7 +6,6 @@ export const registerSchema = z.object({
     username: z.string().min(2, 'Username muy corto').max(50, 'Username muy largo')
 });
 
-//esquema por consistencia, no lleva body realmente
 export const loginSchema = z.object({
 
 });

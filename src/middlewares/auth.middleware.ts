@@ -1,18 +1,18 @@
-import {Request, Response, NextFunction} from 'express';
+import { Request, Response, NextFunction } from 'express';
 import admin from '../config/firebase.js';
 import prisma from '../config/prisma.js';
 
 
-export const verifyToken = async (req:Request, res:Response, next:NextFunction) => {
+export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
-    if(!authHeader || !authHeader.startsWith('Bearer ')){
-        return res.status(401).json({message: 'No token provided'});
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'No token provided' });
     }
 
     const token = authHeader.split(' ')[1]
 
-    try{
-        const decoded = await admin.auth().verifyIdToken(token!); //quitar el !
+    try {
+        const decoded = await admin.auth().verifyIdToken(token!);
         console.log("✅ Token de Firebase verificado para UID:", decoded.uid);
 
         const dbUser = await prisma.user.findUnique({
@@ -20,7 +20,6 @@ export const verifyToken = async (req:Request, res:Response, next:NextFunction) 
         });
 
         if (!dbUser) {
-            console.log("❌ Usuario con UID", decoded.uid, "no encontrado en PostgreSQL");
             return res.status(401).json({ success: false, message: 'Usuario no registrado en el sistema' });
 
         }
@@ -33,8 +32,8 @@ export const verifyToken = async (req:Request, res:Response, next:NextFunction) 
         console.log("Autenticación exitosa. Pasando al controlador...");
         next();
 
-    }catch(error){
+    } catch (error) {
         console.error(" Error verificando token de Firebase:", error);
-        return res.status(401).json({message: 'Invalid token'});
+        return res.status(401).json({ message: 'Invalid token' });
     }
 }
