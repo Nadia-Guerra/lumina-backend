@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String    @id @default(uuid())
+  username   String    @unique
+  email      String    @unique
+  password   String
+  created_at DateTime  @default(now())
+  favorites  Favorite[]
+  reviews    Review[]
+}
+
+model MakeupProduct {
+  id              String         @id @default(uuid())
+  external_id     Int            @unique
+  name            String
+  description     String?
+  img_url         String?
+  product_type_id String?
+  productType     ProductType?   @relation(fields: [product_type_id], references: [id])
+  colors          ProductColor[]
+  favorites       Favorite[]
+  reviews         Review[]
+}
+
+model ProductColor {
+  id                String        @id @default(uuid())
+  color_name        String
+  hex_code          String?
+  makeup_product_id String
+  product           MakeupProduct @relation(fields: [makeup_product_id], references: [id])
+}
+
+model ProductType {
+  id              String          @id @default(uuid())
+  name            String
+  products        MakeupProduct[]
+  styleRequirements StyleRequiredProductType[]
+}
+
+model Favorite {
+  id                String        @id @default(uuid())
+  user_id           String
+  makeup_product_id String
+  created_at        DateTime      @default(now())
+  user              User          @relation(fields: [user_id], references: [id])
+  product           MakeupProduct @relation(fields: [makeup_product_id], references: [id])
+
+  @@unique([user_id, makeup_product_id])
+}
+
+model Review {
+  id                String        @id @default(uuid())
+  rating            Int
+  content           String?
+  created_at        DateTime      @default(now())
+  user_id           String
+  makeup_product_id String
+  user              User          @relation(fields: [user_id], references: [id])
+  product           MakeupProduct @relation(fields: [makeup_product_id], references: [id])
+}
+
+model MakeupStyle {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  style_img   String?
+  examples    MakeupExample[]
+  requiredProductTypes StyleRequiredProductType[]
+}
+
+model MakeupExample {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  example_img String?
+  style_id    String
+  style       MakeupStyle @relation(fields: [style_id], references: [id])
+}
+
+model StyleRequiredProductType {
+  style_id        String
+  product_type_id String
+  style           MakeupStyle @relation(fields: [style_id], references: [id])
+  productType     ProductType @relation(fields: [product_type_id], references: [id])
+
+  @@id([style_id, product_type_id])
+}

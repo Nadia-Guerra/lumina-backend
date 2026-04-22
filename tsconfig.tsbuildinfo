@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/config/firebase.ts","./src/config/prisma.ts","./src/controllers/recommendation.controller.ts","./src/middlewares/auth.middleware.ts","./src/routes/recommendation.routes.ts","./src/services/gemini.service.ts","./src/services/makeup.service.ts"],"version":"6.0.2"}
