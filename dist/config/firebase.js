@@ -2,7 +2,7 @@ import admin from 'firebase-admin';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 try {
-    const serviceAccount = require('../../firebase-service-account.json');
+    const serviceAccount = require('../../firebase-account.json');
     console.log("📄 JSON cargado:", !!serviceAccount); // solo para debug
     if (!admin.apps.length) {
         admin.initializeApp({
