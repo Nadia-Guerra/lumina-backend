@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 // Routes
-app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/favourites', favouriteRoutes);
 
 // Base route for health check

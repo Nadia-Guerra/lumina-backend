@@ -1,5 +1,7 @@
 import {Request, Response, NextFunction} from 'express';
 import admin from '../config/firebase.js';
+import prisma from '../config/prisma.js';
+
 
 export const verifyToken = async (req:Request, res:Response, next:NextFunction) => {
     const authHeader = req.headers.authorization;
@@ -13,6 +15,19 @@ export const verifyToken = async (req:Request, res:Response, next:NextFunction) 
         const decoded = await admin.auth().verifyIdToken(token!); //quitar el !
         (req as any).user = decoded; //correccion rapida, luego se arregla
         next();
+
+        const dbUser = await prisma.user.findUnique({
+            where: { firebaseUid: decoded.uid }
+        });
+
+        if (!dbUser) {
+            return res.status(401).json({ success: false, message: 'Usuario no registrado en el sistema' });
+        }
+
+        (req as any).user = { ...decoded, dbId: dbUser.id };
+        next();
+
+
     }catch(error){
         return res.status(401).json({message: 'Invalid token'});
     }
