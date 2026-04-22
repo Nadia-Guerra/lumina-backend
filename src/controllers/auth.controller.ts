@@ -4,18 +4,32 @@ import { authService } from '../services/auth.service.js';
 export const register = async (req: Request, res: Response) => {
     try {
         const { email, password, username } = req.body;
-        if (!email || !password || !username) {
-            return res.status(400).json({ message: 'Faltan campos obligatorios' });
-        }
 
         const newUser = await authService.register(email, password, username);
-        res.status(201).json({
+        return res.status(201).json({
+            success: true,
             message: 'Usuario registrado exitosamente',
-            user: newUser
+            data: newUser
         });
+
     } catch (error: any) {
-        console.error("❌ Error completo:", error);
-        res.status(500).json({ message: 'Error en el registro', error: error.message });
+        if (error?.errorInfo?.code === 'auth/email-already-exists') {
+            return res.status(409).json({
+                success: false,
+                message: 'El email ya está registrado'
+            });
+        }
+        if (error?.code === 'P2002') {
+            return res.status(409).json({
+                success: false,
+                message: 'Ya existe un usuario con ese email'
+            });
+        }
+        console.error('Error en register:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor'
+        });
     }
 };
 
@@ -25,13 +39,23 @@ export const loginSync = async (req: Request, res: Response) => {
         const { uid, email, name } = (req as any).user;
 
         const user = await authService.syncUser(uid, email, name);
-
-        res.status(200).json({
-            message: 'Login exitoso y sincronizado',
-            user
+        return res.status(200).json({
+            success: true,
+            message: 'Login exitoso',
+            data: user
         });
+
     } catch (error: any) {
-        console.error("❌ Error completo:", error);
-        res.status(500).json({ message: 'Error al sincronizar usuario', error: error.message });
+        if (error?.code === 'P2002') {
+            return res.status(409).json({
+                success: false,
+                message: 'Conflicto al sincronizar usuario'
+            });
+        }
+        console.error('Error en loginSync:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error interno del servidor'
+        });
     }
 };
