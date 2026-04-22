@@ -20,6 +20,10 @@
   },
   "dependencies": {
     "dotenv": "^17.4.2",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.5.2",
+    "@types/pg": "^8.20.0",
     "@google/genai": "^1.50.1",
     "@prisma/adapter-pg": "^7.7.0",
     "@prisma/client": "^7.7.0",
@@ -31,10 +35,6 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.5.2",
-    "@types/pg": "^8.20.0",
     "nodemon": "^3.1.14",
     "prisma": "^7.7.0",
     "ts-node": "^10.9.2",
