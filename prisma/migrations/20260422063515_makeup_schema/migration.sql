@@ -102,3 +102,5 @@ ALTER TABLE "favorites" ADD CONSTRAINT "favorites_user_id_fkey" FOREIGN KEY ("us
 
 -- AddForeignKey
 ALTER TABLE "favorites" ADD CONSTRAINT "favorites_makeup_product_id_fkey" FOREIGN KEY ("makeup_product_id") REFERENCES "makeup_products"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE users ADD COLUMN firebase_uid VARCHAR(128) UNIQUE;
