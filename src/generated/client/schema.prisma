@@ -1,0 +1,91 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/client"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [uuid_ossp(map: "uuid-ossp")]
+}
+
+model User {
+  id        String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  username  String     @db.VarChar(50)
+  email     String     @unique @db.VarChar(100)
+  password  String     @db.VarChar(255)
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamp(6)
+  reviews   Review[]
+  favorites Favorite[]
+
+  @@map("users")
+}
+
+model MakeupProduct {
+  id         String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  externalId Int        @unique @map("external_id")
+  name       String?    @db.VarChar(100)
+  imgUrl     String?    @map("img_url") @db.VarChar(255)
+  reviews    Review[]
+  favorites  Favorite[]
+
+  @@map("makeup_products")
+}
+
+model MakeupStyle {
+  id          String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String          @db.VarChar(50)
+  description String?         @db.Text
+  styleImg    String?         @map("style_img") @db.VarChar(255)
+  rules       StyleRule[]
+  examples    MakeupExample[]
+
+  @@map("makeup_styles")
+}
+
+model StyleRule {
+  id             String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  styleId        String      @map("style_id") @db.Uuid
+  productType    String?     @map("product_type") @db.VarChar(50)
+  tagRequirement String?     @map("tag_requirement") @db.VarChar(50)
+  colorFamily    String?     @map("color_family") @db.VarChar(50)
+  style          MakeupStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@map("style_rules")
+}
+
+model MakeupExample {
+  id           String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  styleId      String      @map("style_id") @db.Uuid
+  title        String?     @db.VarChar(100)
+  imageUrl     String?     @map("image_url") @db.VarChar(255)
+  tutorialTips String?     @map("tutorial_tips") @db.Text
+  style        MakeupStyle @relation(fields: [styleId], references: [id], onDelete: Cascade)
+
+  @@map("makeup_examples")
+}
+
+model Review {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  rating          Int?
+  content         String?       @db.Text
+  userId          String        @map("user_id") @db.Uuid
+  makeupProductId String        @map("makeup_product_id") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product         MakeupProduct @relation(fields: [makeupProductId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Favorite {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String        @map("user_id") @db.Uuid
+  makeupProductId String        @map("makeup_product_id") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product         MakeupProduct @relation(fields: [makeupProductId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, makeupProductId], name: "unique_user_favorite")
+  @@map("favorites")
+}
